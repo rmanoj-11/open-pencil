@@ -43,5 +43,6 @@ export function acpPermissionOptionTestId(kind: string): TestId {
 }
 
 function cssEscape(value: string): string {
-  return CSS.escape(value)
+  if (typeof CSS !== 'undefined' && CSS.escape) return CSS.escape(value)
+  return value.replace(/["\\]/g, '\\$&')
 }
