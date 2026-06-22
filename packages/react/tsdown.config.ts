@@ -1,5 +1,34 @@
+import { createRequire } from 'node:module'
+
 import raw from 'unplugin-raw/rolldown'
 import { defineConfig } from 'tsdown'
+
+const require = createRequire(import.meta.url)
+
+function atlaskitSubpathResolver() {
+  const aliases = new Map([
+    [
+      '@atlaskit/pragmatic-drag-and-drop-hitbox/tree-item',
+      '@atlaskit/pragmatic-drag-and-drop-hitbox/dist/esm/tree-item.js'
+    ],
+    [
+      '@atlaskit/pragmatic-drag-and-drop/combine',
+      '@atlaskit/pragmatic-drag-and-drop/dist/esm/entry-point/combine.js'
+    ],
+    [
+      '@atlaskit/pragmatic-drag-and-drop/element/adapter',
+      '@atlaskit/pragmatic-drag-and-drop/dist/esm/adapter/element-adapter.js'
+    ]
+  ])
+
+  return {
+    name: 'atlaskit-subpath-resolver',
+    resolveId(id: string) {
+      const target = aliases.get(id)
+      return target ? require.resolve(target) : null
+    }
+  }
+}
 
 export default defineConfig({
   entry: {
@@ -19,7 +48,12 @@ export default defineConfig({
     moduleSideEffects: false
   },
   deps: {
-    alwaysBundle: [],
+    alwaysBundle: [
+      '@atlaskit/pragmatic-drag-and-drop',
+      /^@atlaskit\/pragmatic-drag-and-drop\//,
+      '@atlaskit/pragmatic-drag-and-drop-hitbox',
+      /^@atlaskit\/pragmatic-drag-and-drop-hitbox\//
+    ],
     neverBundle: [
       'react',
       /^react\//,
@@ -30,6 +64,9 @@ export default defineConfig({
       /^@open-pencil\/core\//,
       'canvaskit-wasm',
       'use-sync-external-store',
+      'nanostores',
+      '@nanostores/i18n',
+      '@tanstack/react-table',
       'opentype.js',
       'culori',
       'fflate',
@@ -55,7 +92,7 @@ export default defineConfig({
     ],
     onlyBundle: false
   },
-  plugins: [raw()],
+  plugins: [atlaskitSubpathResolver(), raw()],
   inputOptions: {
     preserveEntrySignatures: 'allow-extension',
     checks: {

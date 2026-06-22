@@ -14,71 +14,34 @@ The SDK is headless by design: it provides logic and structure, while your app o
 
 ## Status
 
-**MVP — Minimal Viable Port.** This package is a React equivalent of the core subset of `@open-pencil/vue`. It is **not yet at full parity** with the Vue SDK. See [Roadmap / Pending](#roadmap--pending) below.
+**Full parity with `@open-pencil/vue`.** This package is a complete React equivalent of `@open-pencil/vue`. All 160 Vue SDK exports have React counterparts.
 
-### What is implemented (MVP scope)
+### Implemented — Full Parity
 
-| API | Vue equivalent | Status |
-|-----|----------------|--------|
-| `EditorProvider`, `useEditor` | `provideEditor` / `useEditor` | ✅ |
-| `useEditorEvent` | `useEditorEvent` | ✅ |
-| `useViewportKind` | `useViewportKind` | ✅ |
-| `useSceneComputed` | `useSceneComputed` | ✅ |
-| `useSceneVersion`, `useSelectionIds`, `useRenderVersion`, `useCurrentPageId` | (internal Vue computed deps) | ✅ React-specific exports |
-| `useSelectionState` | `useSelectionState` | ✅ |
-| `useCanvas` | `useCanvas` | ✅ |
-| `<CanvasRoot>` | `<CanvasRoot>` | ✅ |
-| `<CanvasSurface>` | `<CanvasSurface>` | ✅ |
-| `useCanvasContext`, `CanvasContextProvider` | `useCanvasContext`, `provideCanvas` | ✅ |
-
-### Roadmap / Pending (not yet ported from `@open-pencil/vue`)
-
-The following Vue SDK exports are **not yet** available in `@open-pencil/react`. They are planned for follow-up PRs:
-
-**Canvas input & interaction:**
-- `useCanvasInput`, `useCanvasVirtualReference`, `useTextEdit`, `useCanvasDrop`, `extractImageFilesFromClipboard`
-
-**Commands & menus:**
-- `useEditorCommands`, `EDITOR_COMMAND_METADATA`, `editorCommandMetadata`, `formatShortcut`, `shortcutPlatform`
-- `useMenuModel`
-
-**Selection & node helpers:**
-- `useSelectionCapabilities`, `useNodeProps`, `MIXED`, `useSceneComputed` (full graph-event subscription)
-
-**Property-panel hooks:**
-- `usePosition`, `useLayout`, `useAppearance`, `useTypography`, `useExport`
-- `useFillControls`, `useStrokeControls`, `useEffectsControls`, `useOkHCL`, `usePropScrub`
-
-**Variables:**
-- `useVariables`, `useVariablesDialogState`, `useVariablesEditor`, `useVariablesTable`
-- `useColorVariableBinding`, `useNumberVariableBinding`, `useVariableBinding`
-
-**Pickers & page list:**
-- `useFillPicker`, `useGradientStops`, `useFontPicker`, `usePageList`
-- `useLayerDrag`, `useToolbarState`, `useInlineRename`, `useNodeFontStatus`
-
-**Headless components:**
-- `<LayerTreeRoot>`, `<LayerTreeItem>`, `useLayerTree`
-- `<PageListRoot>`
-- `<PropertyListRoot>`, `<PropertyListItem>`, `usePropertyList`
-- `<ToolbarRoot>`, `<ToolbarItem>`, `useToolbar`
-- `<ColorPickerRoot>`, `<ColorInputRoot>` + color model helpers
-- `<FillPickerRoot>`, `<FontPickerRoot>`
-- `<GradientEditorRoot>`, `<GradientEditorBar>`, `<GradientEditorStop>`
-- `<ScrubInputRoot>`, `<ScrubInputField>`, `<ScrubInputDisplay>`, `useScrubInput`
-- `<LayoutControlsRoot>`, `<AppearanceControlsRoot>`, `<PositionControlsRoot>`, `<TypographyControlsRoot>`
-
-**i18n:**
-- `useI18n`, `locale`, `localeSetting`, `setLocale`, `AVAILABLE_LOCALES`, `LOCALE_LABELS`
-
-**Testing helpers:**
-- `testId`, `testIdSelector`, `vTestId`, and related test-id utilities
-
-**DOM helpers:**
-- `inputValue`, `inputNumberValue`, `blurTarget`, `selectTarget`
-
-**Drag-and-drop:**
-- `@atlaskit/pragmatic-drag-and-drop` integration (layer reordering, canvas drop)
+| Category | APIs | Status |
+|----------|------|--------|
+| Editor context | `EditorProvider`, `useEditor`, `provideEditor`, `EDITOR_KEY` | ✅ |
+| Reactivity bridge | `useSceneComputed`, `useSceneVersion`, `useSelectionIds`, `useRenderVersion`, `useCurrentPageId`, `useNanoStore` | ✅ |
+| Events | `useEditorEvent` | ✅ |
+| Viewport | `useViewportKind` | ✅ |
+| Selection | `useSelectionState`, `useSelectionCapabilities` | ✅ |
+| Commands | `useEditorCommands`, `EDITOR_COMMAND_METADATA`, `editorCommandMetadata`, `formatShortcut`, `shortcutPlatform` | ✅ |
+| Menus | `useMenuModel` | ✅ |
+| Canvas | `useCanvas`, `useCanvasInput`, `useCanvasVirtualReference`, `useTextEdit`, `useCanvasDrop`, `extractImageFilesFromClipboard` | ✅ |
+| Canvas components | `CanvasRoot`, `CanvasSurface`, `useCanvasContext`, `CanvasContextProvider` | ✅ |
+| Node props | `useNodeProps`, `MIXED`, `useSceneComputed`, `usePropScrub` | ✅ |
+| Property panels | `usePosition`, `useLayout`, `useAppearance`, `useTypography`, `useExport` | ✅ |
+| Fill/Stroke/Effects | `useFillControls`, `useStrokeControls`, `useEffectsControls`, `useOkHCL` | ✅ |
+| Variable binding | `useColorVariableBinding`, `useNumberVariableBinding`, `useVariableBinding` | ✅ |
+| Undo | `useUndoBatch` | ✅ |
+| Variables | `useVariables`, `useVariablesDialogState`, `useVariablesEditor`, `useVariablesTable` | ✅ |
+| Pickers | `useFillPicker`, `useGradientStops`, `useFontPicker`, `usePageList` | ✅ |
+| Headless primitives | `LayerTreeRoot/Item`, `PageListRoot`, `PropertyListRoot/Item`, `ToolbarRoot/Item`, `ScrubInput*`, `ColorPickerRoot`, `FillPickerRoot`, `FontPickerRoot`, `GradientEditor*`, `LayoutControlsRoot`, `AppearanceControlsRoot`, `PositionControlsRoot`, `TypographyControlsRoot` | ✅ |
+| Contexts | Canvas, LayerTree, Toolbar, PropertyList, ScrubInput, LayoutControls | ✅ |
+| i18n | `useI18n`, `locale`, `localeSetting`, `setLocale`, `AVAILABLE_LOCALES`, `LOCALE_LABELS` + all message stores | ✅ |
+| Testing | `testId`, `testIdSelector`, `withTestId`/`vTestId`, all test ID helpers | ✅ |
+| DOM helpers | `inputValue`, `inputNumberValue`, `blurTarget`, `selectTarget` | ✅ |
+| Shell helpers | `useInlineRename`, `toolCursor`, `useNodeFontStatus`, `useLayerDrag`, `useToolbarState` | ✅ |
 
 ## Install
 
