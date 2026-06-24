@@ -168,25 +168,26 @@ export function useCanvas(
   isMobileRef.current = isMobile
 
   const managerRef = useRef<CanvasSurfaceManager | null>(null)
-  if (!managerRef.current) {
-    const shouldShowRulers = () => {
-      const fn = createRulerVisibility(options)
-      return fn(isMobileRef.current)
-    }
-    managerRef.current = createCanvasSurfaceManager({
-      editor,
-      canvasRef,
-      options,
-      getCanvasKit: () => ckRef.current,
-      isDestroyed: () => lifecycleRef.current.destroyed,
-      shouldShowRulers
-    })
+  // Recreate the surface manager on each effect run (React Strict Mode safe)
+  const shouldShowRulers = () => {
+    const fn = createRulerVisibility(options)
+    return fn(isMobileRef.current)
   }
+  managerRef.current = createCanvasSurfaceManager({
+    editor,
+    canvasRef,
+    options,
+    getCanvasKit: () => ckRef.current,
+    isDestroyed: () => lifecycleRef.current.destroyed,
+    shouldShowRulers
+  })
 
   useEffect(() => {
     const canvas = canvasRef.current
     if (!canvas) return
 
+    // Reset lifecycle state for this effect run (React Strict Mode runs effects twice)
+    lifecycleRef.current = { destroyed: false }
     let cancelled = false
 
     async function init() {
