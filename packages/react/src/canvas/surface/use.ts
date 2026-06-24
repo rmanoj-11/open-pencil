@@ -186,6 +186,10 @@ export function useCanvas(
     const canvas = canvasRef.current
     if (!canvas) return
 
+    // Capture the manager for THIS effect run (React Strict Mode safe)
+    // managerRef.current may be overwritten by a second render before cleanup runs
+    const manager = managerRef.current!
+
     // Reset lifecycle state for this effect run (React Strict Mode runs effects twice)
     lifecycleRef.current = { destroyed: false }
     let cancelled = false
@@ -201,16 +205,16 @@ export function useCanvas(
 
         const canvasEl = canvasRef.current
         if (!canvasEl) return
-        managerRef.current!.createSurface(canvasEl)
+        manager.createSurface(canvasEl)
 
-        const renderer = managerRef.current!.getRenderer()
+        const renderer = manager.getRenderer()
         if (renderer) {
-          await renderer.loadFonts(managerRef.current!.renderNow)
+          await renderer.loadFonts(manager.renderNow)
         } else {
           console.warn('[open-pencil] Canvas surface creation failed — no WebGL context. Check browser WebGL support.')
         }
         if (cancelled || lifecycleRef.current.destroyed) return
-        managerRef.current!.renderNow()
+        manager.renderNow()
         options?.onReady?.()
       } catch (err) {
         console.error('[open-pencil] Canvas initialization failed:', err)
@@ -222,7 +226,7 @@ export function useCanvas(
     const resizeObserver = new ResizeObserver(() => {
       const canvasEl = canvasRef.current
       if (!canvasEl || !ckRef.current) return
-      managerRef.current!.resizeCanvas(canvasEl)
+      manager.resizeCanvas(canvasEl)
     })
     resizeObserver.observe(canvas)
 
@@ -230,7 +234,7 @@ export function useCanvas(
       cancelled = true
       lifecycleRef.current.destroyed = true
       resizeObserver.disconnect()
-      managerRef.current!.destroy()
+      manager.destroy()
     }
   }, [editor, canvasRef, options?.layer, options?.showRulers, options?.preserveDrawingBuffer])
 
