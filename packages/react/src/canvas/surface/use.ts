@@ -77,7 +77,10 @@ export function createCanvasSurfaceManager({
     { reloadFonts = false }: { reloadFonts?: boolean } = {}
   ) {
     const ck = getCanvasKit()
-    if (!ck) return
+    if (!ck) {
+      console.warn('[open-pencil] CanvasKit not initialized yet')
+      return
+    }
 
     if (state.renderer) editor.removeCanvasRenderer(state.renderer)
     state.renderer?.destroy()
@@ -85,12 +88,19 @@ export function createCanvasSurfaceManager({
     state.glContext?.delete()
     state.glContext = null
 
+    const w = canvas.clientWidth
+    const h = canvas.clientHeight
+    if (w === 0 || h === 0) {
+      console.warn('[open-pencil] Canvas has zero dimensions:', { width: w, height: h })
+    }
+
     sizeCanvas(canvas, editor)
 
     const result = makeGLSurface(ck, canvas, editor, options, state.glContext)
     state.glContext = result.glContext
     const surface = result.surface
     if (!surface) {
+      console.warn('[open-pencil] Failed to create GL surface — WebGL may be unavailable')
       canvas.dataset.surfaceError = 'webgl'
       return
     }
@@ -180,24 +190,30 @@ export function useCanvas(
     let cancelled = false
 
     async function init() {
-      const ck = await getCanvasKit()
-      if (cancelled || lifecycleRef.current.destroyed) return
-      ckRef.current = ck
+      try {
+        const ck = await getCanvasKit()
+        if (cancelled || lifecycleRef.current.destroyed) return
+        ckRef.current = ck
 
-      await new Promise<void>((resolve) => requestAnimationFrame(() => resolve()))
-      if (cancelled || lifecycleRef.current.destroyed) return
+        await new Promise<void>((resolve) => requestAnimationFrame(() => resolve()))
+        if (cancelled || lifecycleRef.current.destroyed) return
 
-      const canvasEl = canvasRef.current
-      if (!canvasEl) return
-      managerRef.current!.createSurface(canvasEl)
+        const canvasEl = canvasRef.current
+        if (!canvasEl) return
+        managerRef.current!.createSurface(canvasEl)
 
-      const renderer = managerRef.current!.getRenderer()
-      if (renderer) {
-        await renderer.loadFonts(managerRef.current!.renderNow)
+        const renderer = managerRef.current!.getRenderer()
+        if (renderer) {
+          await renderer.loadFonts(managerRef.current!.renderNow)
+        } else {
+          console.warn('[open-pencil] Canvas surface creation failed — no WebGL context. Check browser WebGL support.')
+        }
+        if (cancelled || lifecycleRef.current.destroyed) return
+        managerRef.current!.renderNow()
+        options?.onReady?.()
+      } catch (err) {
+        console.error('[open-pencil] Canvas initialization failed:', err)
       }
-      if (cancelled || lifecycleRef.current.destroyed) return
-      managerRef.current!.renderNow()
-      options?.onReady?.()
     }
 
     void init()

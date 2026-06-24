@@ -14,12 +14,19 @@ export async function getCanvasKit(options?: CanvasKitOptions): Promise<CanvasKi
 
   const defaultLocate = (file: string) => {
     if (!IS_BROWSER) {
-      const ckPath = import.meta.resolve('canvaskit-wasm')
-      return decodeURIComponent(new URL(file, ckPath).pathname)
+      // Node.js / SSR — return the file name, the bundler resolves it
+      return file
     }
-    const base = 'env' in import.meta ? import.meta.env.BASE_URL : '/'
-    const prefix = base === '/' ? '' : base.replace(/\/$/, '')
-    return `${prefix}/${file}`
+    // Browser — serve from the public root
+    // Works with Vite (import.meta.env.BASE_URL), Next.js (public/), or any static host
+    try {
+      const base = 'env' in import.meta ? import.meta.env.BASE_URL : '/'
+      const prefix = base === '/' ? '' : base.replace(/\/$/, '')
+      return `${prefix}/${file}`
+    } catch {
+      // import.meta not available (webpack without Vite plugin) — use root
+      return `/${file}`
+    }
   }
 
   instance = await CanvasKitInit({
